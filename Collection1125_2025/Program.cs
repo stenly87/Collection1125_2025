@@ -1,7 +1,6 @@
 ﻿// коллекции и тп
 
 // List - список объектов
-
 // пример списка:
 List<int> ints = new List<int>(100); // создание и инициализация списка с элементами int
 // <> - дженерики, обобщения. В угловых скобочках обозначается конкретный
@@ -23,7 +22,7 @@ ints.RemoveRange(1, 2); // удаление двух ячеек, начиная 
 // c коллекцией можно работать как с массивом
 ints[0] = 1;
 Console.WriteLine(ints[0]);
-foreach (int i in ints) 
+foreach (int i in ints)
     Console.WriteLine(i);
 
 // используя лямбда-выражения, мы получаем доступ к многим 
@@ -98,7 +97,7 @@ List<string> strings = ints.Select(s => s.ToString()).ToList();
 List<string> log = new List<string>();
 string command = null;
 while (command != "exit")
-{ 
+{
     Console.Write("Команда? ");
     command = Console.ReadLine();
     log.Add(command);
@@ -106,3 +105,117 @@ while (command != "exit")
 
 Console.WriteLine("Были использованы команды:");
 log.ForEach(s => Console.WriteLine(s));
+
+int notZero = ints.FirstOrDefault(s => s != 0);
+List<int> notZeros = ints.Where(s => s != 0).ToList();
+
+// dictionary
+//Dictionary<тип ключа, тип значения>
+// каждый объект типа Human имеет ключ типа string
+// все ключи в словаре должны быть уникальными
+Dictionary<string, Human> dictionary = new();
+dictionary.Add("first", new Human { Name = "Володя" });
+dictionary.Add("second", new Human { Name = "Света" });
+// при повторной попытке добавить существующий ключ
+// получим exception, что ключ уже существует
+//dictionary.Add("first", new Human { Name = "Света" });
+
+Human testHuman = dictionary["first"];
+dictionary["first"] = new Human { Name = "Не Володя" };
+
+// удаление объекта по ключу
+dictionary.Remove("first");
+// кол-во объектов в словаре
+int count = dictionary.Count;
+// можно перебрать все имеющиеся значения
+foreach (var value in dictionary)
+{
+    Console.WriteLine(value.Key);
+    Console.WriteLine(value.Value);
+}
+// теперь храним объекты Inventory, Human является ключом
+Dictionary<Human, Inventory> inventory = new();
+
+inventory.Add(testHuman, new Inventory { Gold = 1000 });
+
+var inventoryHuman = inventory[testHuman];
+
+List<Item> items = new List<Item>();
+items.AddRange(new Item[] {
+ new Item{ ID = 1, Title = "Кирпич"},
+  new Item{ ID = 2, Title = "Стринги" },
+   new Item{ ID = 3, Title = "Зажигалка" },
+});
+
+Item findItem = items.FirstOrDefault(s => s.ID == 3);
+
+Dictionary<int, Item> itemsDictionary = new();
+
+itemsDictionary.Add(1, new Item { ID = 1, Title = "Кирпич" });
+itemsDictionary.Add(2, new Item { ID = 2, Title = "Стринги" });
+itemsDictionary.Add(3, new Item { ID = 3, Title = "Зажигалка" });
+// эта операция будет гораздо быстрее,
+// чем items.FirstOrDefault(s => s.ID == 3);
+findItem = itemsDictionary[3];
+
+// особенно будет ощущаться разница, если поиск в коллекции происходит в цикле. 
+// такой же поиск по ключу из словаря будет работать мгновенно
+// FirstOrDefault будет выполняться тем дольше, чем больше элементов в коллекции
+// доступ по ключу из словаря от кол-ва объектов в словаре не зависит
+
+// перед чтением значения следует всегда проверять наличие ключа:
+bool exist = itemsDictionary.ContainsKey(1);
+
+// Stack Queue
+Queue<Human> humansQueue = new(); // FIFO *первый пришел - первый вышел
+Stack<Item> itemsStack = new(); // LIFO *последний пришел - первый вышел
+
+itemsStack.Push(findItem); // добавление объекта на стек
+Item getItem = itemsStack.Pop(); // получить и убрать объект из стека
+Item viewItem = itemsStack.Peek(); // получить, но не убирать объект из стека
+// кол-во записей в стеке
+int stackCount = itemsStack.Count;
+
+// будем забирать со стека объекты до тех пор, пока стек не очистится
+while (stackCount > 0)
+{
+    Item takeItem = itemsStack.Pop();
+    Console.WriteLine("Очищаем стек");
+    stackCount = itemsStack.Count;
+}
+
+
+Console.WriteLine("рекурсия:");
+void TestRecursive(int i)
+{
+    i--;
+    if (i > 0)
+        TestRecursive(i);
+    Console.WriteLine(i);
+}
+TestRecursive(10);
+
+Console.WriteLine("Теперь почти то же со стеком");
+Stack<int> ints1 = new Stack<int>();
+ints1.Push(10);
+while (ints1.Count > 0)
+{
+    int i = ints1.Pop();
+    i--;
+    if (i > 0)
+        ints1.Push(i);
+    Console.WriteLine(i);
+}
+
+// пример очереди
+
+humansQueue.Enqueue(new Human { Name = "Я первый" });
+humansQueue.Enqueue(new Human { Name = "Я второй" });
+humansQueue.Enqueue(new Human { Name = "Я третий" });
+
+Human nextHuman1 = humansQueue.Dequeue(); // первый
+Human nextHuman2 = humansQueue.Dequeue(); // второй
+// кол-во человек в очереди
+int queueCount = humansQueue.Count;
+// выдает объект, но не удаляет его из очереди
+Human viewNextHuman = humansQueue.Peek();
